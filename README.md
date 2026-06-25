@@ -1,32 +1,22 @@
-# AIFRIS-STM32
-AIFRIS: Bare-Metal Non-Blocking Adaptive Intelligent Framework for Real-time Instrumentation Systems on STM32F103C8 (Blue Pill) using Proteus &amp; GNUPlot.
+# Dual-Mode PID Controller with Hysteresis for DC Motor (STM32)
 
-# AIFRIS: Adaptive Intelligent Framework for Real-time Instrumentation Systems
+Repositori ini berisi *source code* dan file simulasi untuk implementasi **Pengendali PID Dual-Mode dengan Logika Histeresis** pada *plant* Motor DC. Proyek ini dijalankan menggunakan metode *Software-in-the-Loop* (SIL) menggunakan mikrokontroler STM32F103C8T6 yang disimulasikan di Proteus.
 
-This project implements an **Adaptive Intelligent Framework for Real-time Instrumentation Systems (AIFRIS)** on the STM32F103C8 (Blue Pill) microcontroller. It focuses on a bare-metal, non-blocking architecture to manage multi-sensor data acquisition and PID adaptive control, replacing heavy RTOS overhead with a lightweight super-loop scheduler.
+## 📌 Deskripsi Proyek
+Sistem kendali PID konvensional seringkali kesulitan menyeimbangkan antara waktu respons yang cepat (*fast rise time*) dan stabilitas (tanpa *overshoot* / *chattering*). Proyek ini menyelesaikan masalah tersebut dengan menggunakan **Dual-Mode PID**:
+1. **Mode Agresif (Kp=2.20, Ki=0.30, Kd=0.08):** Digunakan saat *error* besar untuk mempercepat respons.
+2. **Mode Normal (Kp=1.50, Ki=0.70, Kd=0.05):** Digunakan saat *error* kecil untuk menjaga stabilitas dan presisi di sekitar titik target (*setpoint*).
 
-## Features
-- **ADC Polling Sequential:** Efficient data acquisition for PV, Disturbance, and Setpoint.
-- **Dual-Mode Adaptive PID:** Intelligent threshold-based switching between Aggressive and Standard PID modes for optimal transient response.
-- **Bare-Metal Scheduler:** Deterministic task execution based on `HAL_GetTick()` to prevent simulator freezing.
-- **Telemetry Stream:** Non-blocking serial logging for real-time monitoring.
+**Logika Histeresis** ditambahkan sebagai batas transisi antar mode (berpindah ke agresif saat $|error| > 12\%$, dan kembali ke normal saat $|error| < 4.5\%$) untuk mencegah fenomena *chattering* (perpindahan mode terus-menerus yang tidak stabil).
 
-## System Architecture
-- **Microcontroller:** STM32F103C8 (ARM Cortex-M3).
-- **Toolchain:** STM32CubeMX, Keil uVision, Proteus 8.xx, GNUPlot.
+## 🚀 Fitur Utama
+* **Pemodelan Plant Motor DC Orde-1:** Diimplementasikan secara matematis dengan metode diskritisasi *Euler Forward*.
+* **Dual-Mode PID:** Transisi dinamis dua set parameter PID berdasarkan nilai error aktual.
+* **Hysteresis Logic:** Sistem transisi dengan batas atas dan batas bawah yang mencegah *noise* pada sinyal kendali.
+* **Serial Telemetry:** Pengiriman data secara *real-time* (Nilai PWM, Error, RPM) via UART (Virtual Terminal).
 
-## Documentation
-- **Diagrams:** (Include your AIFRIS_block_diagram.drawio.png here)
-- **Flowchart:** (Include your AIFRIS_flowchart.drawio.png here)
-
-## How to Run
-1. Open the `.pdsprj` file in **Proteus 8.xx**.
-2. Flash the `firmware.hex` file to the STM32 Blue Pill model.
-3. Observe the **Virtual Terminal** for data logs and the **Oscilloscope** for PWM signals.
-4. Export the terminal log to `.dat` and use GNUPlot to visualize the transient response.
-
-## Analysis Results
-*(Add your comparison graph here: grafik_perbandingan_PV_2D.png)*
-
-## License
-This project is open-source under the MIT License.
+## 🛠️ Perangkat & Software
+* **Mikrokontroler:** STM32F103C8T6 (Blue Pill)
+* **Motor Driver:** L298N (H-Bridge)
+* **Simulator:** Proteus Professional (v8.x atau lebih baru)
+* **Visualisasi Data:** GNUplot / Python (untuk plotting data UART)
